@@ -1,0 +1,117 @@
+<html>
+
+<script>
+  var myCharacteristic;
+
+  var deviceName;
+
+  function connect() {
+    let serviceUuid = "0000ffe0-0000-1000-8000-00805f9b34fb";
+
+    let characteristicUuid = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+    navigator.bluetooth.requestDevice({filters: [{services: [serviceUuid]}]})
+    .then(device => {
+      log('Connecting...');
+      deviceName = device.name;
+      return device.gatt.connect();
+    })
+    .then(server => {
+      console.log('Getting Service...');
+      return server.getPrimaryService(serviceUuid);
+    })
+    .then(service => {
+      console.log('Getting Characteristic...');
+      return service.getCharacteristic(characteristicUuid);
+    })
+    .then(characteristic => {
+      myCharacteristic = characteristic;
+      return myCharacteristic.startNotifications().then(_ => {
+        console.log('> Notifications started');
+        log("Connected to: " + deviceName);
+        myCharacteristic.addEventListener('characteristicvaluechanged',
+            handleNotifications);
+      });
+    })
+    .catch(error => {
+      console.log('Argh! ' + error);
+    });
+  }
+
+  function disconnect() {
+    if (myCharacteristic) {
+      myCharacteristic.stopNotifications()
+      .then(_ => {
+        console.log('> Notifications stopped');
+        log("Disconnected")
+        myCharacteristic.removeEventListener('characteristicvaluechanged',
+            handleNotifications);
+      })
+      .catch(error => {
+        console.log('Argh! ' + error);
+      });
+    }
+  }
+
+  function handleNotifications(event) {
+    let value = event.target.value;
+    log(deviceName + "> " + new TextDecoder().decode(value));
+    console.log('> Received: ' + new TextDecoder().decode(value));
+  }
+
+  function send() {
+    var data = document.getElementById("input").value;
+    log("You> " + data);
+    myCharacteristic.writeValue(str2ab(data+"\n"))
+    document.getElementById("input").value = "";
+  }
+
+  function str2ab(str) {
+    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+    var bufView = new Uint16Array(buf);
+    for (var i=0, strLen=str.length; i<strLen; i++) {
+      bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+  }
+
+  function log(str) {
+    document.getElementById("term").value += str+"\n";
+  }
+</script>
+
+<head>
+  <title>Web-Bluetooth Terminal</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <div class="header">WEB-BLUETOOTH TERMINAL</div>
+  <div class="terminal"><textarea id="term" readonly class="terminal"></textarea></div>
+  <div class="footer">
+    <div class="inputfield">
+      <input id ="input" type="text" class="input" placeholder="Write something to send here...">
+    </div>
+      <div class="button" style="background-color: black;">
+        <button onclick="send()">
+          <i class="fa fa-paper-plane"></i>
+        </button>
+      </div>
+      <div id="connect" class="button" style="background-color: green;" >
+        <button onclick="connect()">
+          <i class="fa fa-plug"></i>
+        </button>
+      </div>
+      <div class="button" style="background-color: red;">
+        <button onclick="disconnect()">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+  </div>
+</body>
+</html>
