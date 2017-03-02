@@ -11,7 +11,7 @@ Follow this Fritzing diagram to hookup your Arduino to one of the Bluetooth modu
 <br>
 <img src="img/fritzing.png">
 <br>
-Power it on, open the <a href="https://hewittwill.github.io/WebBluetooth-Terminal/">terminal</a> and press the green connect button. A pop-up will appear if you've correctly enabled WebBluetooth on a supported browser (Chrome now supports it natively, except on Windows where you have to navigate to this <a href"chrome://flags">link</a> and enable experimental features). Follow <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/master/implementation-status.md">this</a> link to get a list of the full implementation and how to enable it properly.
+Power it on, open the <a href="https://hewittwill.github.io/WebBluetooth-Terminal/">terminal</a> and press the green connect button. A pop-up will appear if you've correctly enabled WebBluetooth on a supported browser (Chrome now supports it natively, except on Windows where you have to navigate to this <code>chrome://flags</code> and enable experimental features). Follow <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/master/implementation-status.md">this</a> link to get a list of the full implementation and how to enable it properly.
 <br><br>
 Click pair, and you should be auto-magically connected and have a virtual serial link between your browser and your Arduino. Load one of my example sketches and connect an LED if you want to wow your friends by letting them connect to it on THEIR phone.
 <br><br>
